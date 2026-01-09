@@ -1,4 +1,17 @@
 {
-  "latest_version": "1.1",
-  "changelog": "VERSION 1.1\n--------------------------\n• hello\n\nv1.1\nhello\n\nInitial Release"
+  "latest_version": "1.2",
+  "updates": [
+    {
+      "v": "1.2",
+      "notes": "• Added new themes\n• Improved performance"
+    },
+    {
+      "v": "1.1",
+      "notes": "• Bug fixes"
+    },
+    {
+      "v": "1.0",
+      "notes": "• Initial Release"
+    }
+  ]
 }
