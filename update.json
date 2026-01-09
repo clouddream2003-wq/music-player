@@ -1,10 +1,6 @@
 {
-  "latest_version": "1.2",
+  "latest_version": "1.1",
   "updates": [
-    {
-      "v": "1.2",
-      "notes": "• Added new themes\n• Improved performance"
-    },
     {
       "v": "1.1",
       "notes": "• nf"
