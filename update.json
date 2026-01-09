@@ -1,6 +1,10 @@
 {
-  "latest_version": "1.1",
+  "latest_version": "1.3",
   "updates": [
+    {
+      "v": "1.3",
+      "notes": "• Nothing"
+    },
     {
       "v": "1.0",
       "notes": "• kd"
