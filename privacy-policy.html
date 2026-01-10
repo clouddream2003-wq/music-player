@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - CloudDream Audio Player</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        p { margin-bottom: 15px; }
+        ul { margin-bottom: 15px; }
+        .highlight { background-color: #f8f9fa; padding: 15px; border-left: 4px solid #3A7FFF; border-radius: 4px; }
+        .footer { margin-top: 50px; font-size: 0.9em; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+        a { color: #3A7FFF; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h1>Privacy Policy</h1>
+    <p><strong>Last Updated:</strong> <span id="date">January 2025</span></p>
+
+    <p>Thank you for using <strong>CloudDream Audio Player</strong> ("we," "our," or "us"). This Privacy Policy explains how we handle your information. We believe in your privacy; our app is designed to be <strong>offline-first</strong>, meaning your personal music data stays on your device.</p>
+
+    <h2>1. Data We Collect (and Don't Collect)</h2>
+    
+    <h3>1.1 Local Music Files</h3>
+    <p>Our app scans your device's storage to find audio files, album art, and metadata (Artist, Title, Genre). This process happens entirely locally on your device. We <strong>do not</strong> upload your music library or listening history to any cloud server.</p>
+
+    <h3>1.2 User Preferences</h3>
+    <p>We store your preferences (such as "Sleep Timer" duration, "Sort Order," and theme settings) locally in your device's standard <code>SharedPreferences</code>.</p>
+
+    <h3>1.3 Personal Information</h3>
+    <p>We do not collect, store, or transmit your name, email address, or phone number. We do not require you to create an account to use the app.</p>
+
+    <h2>2. App Permissions</h2>
+    <p>To function correctly, CloudDream requires specific permissions:</p>
+    <ul>
+        <li><strong>Storage (Read/Write):</strong> Required to display your songs and allow you to rename or delete files.</li>
+        <li><strong>System Settings (Write):</strong> Required only if you use the "Set as Ringtone" feature.</li>
+        <li><strong>Internet Access:</strong> Required <em>strictly</em> for the "Support" features described below.</li>
+    </ul>
+
+    <div class="highlight">
+        <h3>3. Third-Party Services & Internet Usage</h3>
+        <p>While CloudDream is an offline player, we use the internet for two specific functions in the "Support" menu:</p>
+        
+        <p><strong>A. Currency Conversion</strong><br>
+        To display donation tiers in your local currency, we query an open-source exchange rate API (<code>open.er-api.com</code>). This request sends your IP address to the API provider solely to fulfill the request. No personal data is attached.</p>
+
+        <p><strong>B. Payments (Donations)</strong><br>
+        If you choose to support us, we use <strong>Stripe</strong> to process payments. When you click "Support Now," you are redirected to a secure Stripe Checkout page. We <strong>never</strong> see or store your credit card details. All financial transactions are handled directly by Stripe's secure servers.</p>
+    </div>
+
+    <h2>4. Changes to Files</h2>
+    <p>CloudDream allows you to modify your files (Rename, Delete, Edit Tags). These actions are irreversible. We are not responsible for accidental deletion of data caused by user action.</p>
+
+    <h2>5. Changes to This Policy</h2>
+    <p>We may update our Privacy Policy from time to time. You are advised to review this page periodically for any changes.</p>
+
+    <h2>6. Contact Us</h2>
+    <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+    <p>Email: <a href="mailto:support@clouddreamplayer.com">support@clouddreamplayer.com</a></p>
+
+    <div class="footer">
+        &copy; 2025 CloudDream Audio Player. All rights reserved.
+    </div>
+
+    <script>
+        // Optional: Auto-update date
+        const date = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('date').innerText = date.toLocaleDateString('en-US', options);
+    </script>
+</body>
+  </html>
+      
