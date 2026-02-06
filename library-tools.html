@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Tools - CloudDream Player</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            line-height: 1.6; color: #333; background-color: #ffffff;
+            max-width: 850px; margin: 0 auto; padding: 20px; 
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #3A7FFF; margin-top: 30px; }
+        h3 { color: #34495e; margin-top: 20px; border-left: 4px solid #3A7FFF; padding-left: 10px; }
+        p { margin-bottom: 15px; }
+        .step { background: #f1f3f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3A7FFF; }
+        pre { 
+            background: #2d2d2d; color: #f8f8f2; padding: 15px; 
+            border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.4;
+            position: relative; margin-bottom: 25px;
+        }
+        .command-list {
+            background: #2d2d2d; color: #f8f8f2; padding: 15px;
+            border-radius: 8px; font-family: monospace; font-size: 14px;
+            list-style: none; margin: 10px 0;
+        }
+        .command-list li { margin-bottom: 12px; border-bottom: 1px solid #444; padding-bottom: 8px; }
+        .command-list li:last-child { border-bottom: none; }
+        .command-text { color: #3A7FFF; font-weight: bold; display: block; margin-bottom: 4px; }
+        .command-desc { font-size: 0.9em; color: #bbb; display: block; line-height: 1.2; }
+        .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
+        .footer { margin-top: 50px; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
+        
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #121212; color: #e0e0e0; }
+            h1 { color: #ffffff; border-bottom-color: #333; }
+            h3 { color: #8ab4f8; }
+            .step { background: #1e1e1e; color: #e0e0e0; }
+            .warning { background: #2c2205; color: #ffe69c; border-color: #664d03; }
+            .footer { border-top-color: #333; color: #999; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Library Tools: Audio Normalization</h1>
+    <p>Achieve a consistent volume across your entire offline library using <strong>Industry Standard LUFS Normalization</strong> (-14 LUFS). Since mobile processing is heavy on battery, we recommend using <strong>Termux</strong> for this task.</p>
+
+    <div class="warning">
+        <strong>Important:</strong> These scripts create optimized copies of your music in a new folder (<code>EncodedMusic</code>). Your original files will remain untouched.
+    </div>
+
+    <h2>Phase 1: Environment Setup</h2>
+    <div class="step">
+        1. Install <strong>Termux</strong> from <a href="https://f-droid.org/en/packages/com.termux/">F-Droid</a>.<br>
+        2. Open Termux and run these commands <strong>one by one</strong> to prepare your system:
+        <ul class="command-list">
+            <li>
+                <span class="command-text">termux-setup-storage</span>
+                <span class="command-desc">Grants Termux permission to access your phone's music and storage folders.</span>
+            </li>
+            <li>
+                <span class="command-text">pkg update</span>
+                <span class="command-desc">Updates the list of available software packages to the latest versions.</span>
+            </li>
+            <li>
+                <span class="command-text">pkg upgrade</span>
+                <span class="command-desc">Downloads and installs the latest updates for your current Termux system.</span>
+            </li>
+            <li>
+                <span class="command-text">pkg install x11-repo</span>
+                <span class="command-desc">Adds additional software repositories required for multimedia processing tools.</span>
+            </li>
+            <li>
+                <span class="command-text">pkg install ffmpeg</span>
+                <span class="command-desc">Installs the core engine used to analyze, normalize, and encode your audio files.</span>
+            </li>
+        </ul>
+    </div>
+
+    <h2>Phase 2: Choose Your Script</h2>
+    <p>Copy the script below based on your preferred output format. Save it as a file (e.g., <code>normalize.sh</code>) and run it with <code>bash normalize.sh</code>.</p>
+
+    <h3>Option A: Opus (High Efficiency)</h3>
+    <p>Recommended for mobile. Best balance of small file size and high audio quality.</p>
+    <pre>#!/bin/bash
+INPUT_DIR="/storage/emulated/0/Music"
+OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
+TARGET_LUFS=-14
+MAX_TRUE_PEAK_DB=-1.5
+OUTPUT_SAMPLE_RATE=48000
+OUTPUT_CHANNELS=2
+OPUS_BITRATE="128k"
+
+mkdir -p "$OUTPUT_DIR"
+LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^(${MAX_TRUE_PEAK_DB}/20) }")
+
+for input_file in "$INPUT_DIR"/*.mp3; do
+    [ -e "$input_file" ] || continue
+    base_name=$(basename "$input_file" .mp3)
+    output_file="$OUTPUT_DIR/${base_name}.opus"
+
+    echo "Analyzing: $base_name..."
+    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_TRUE_PEAK_DB:print_format=json" -f null - 2>&1)
+    input_i=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"-?\d+\.?\d*"' | cut -d ':' -f2 | tr -d ' "')
+
+    if [ -z "$input_i" ]; then continue; fi
+    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
+
+    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libopus -b:a "$OPUS_BITRATE" -vbr on -compression_level 10 "$output_file"
+done
+echo "Done: All files processed."</pre>
+
+    <h3>Option B: FLAC (Lossless)</h3>
+    <p>Best for audiophiles who want no loss in audio data while keeping volumes consistent.</p>
+    <pre>#!/bin/bash
+INPUT_DIR="/storage/emulated/0/Music"
+OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
+TARGET_LUFS=-14
+MAX_TRUE_PEAK_DB=-1.5
+OUTPUT_SAMPLE_RATE=48000
+OUTPUT_CHANNELS=2
+OUTPUT_CODEC="flac"
+
+mkdir -p "$OUTPUT_DIR"
+LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^(${MAX_TRUE_PEAK_DB}/20) }")
+
+for input_file in "$INPUT_DIR"/*.mp3; do
+    [ -e "$input_file" ] || continue
+    base_name=$(basename "$input_file" .mp3)
+    output_file="$OUTPUT_DIR/${base_name}.flac"
+
+    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_TRUE_PEAK_DB:print_format=json" -f null - 2>&1)
+    input_i=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"-?\d+\.?\d*"' | cut -d ':' -f2 | tr -d ' "')
+
+    if [ -z "$input_i" ]; then continue; fi
+    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
+
+    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a "$OUTPUT_CODEC" "$output_file"
+done
+echo "Done: All files processed."</pre>
+
+    <h3>Option C: MP3 (Maximum Compatibility)</h3>
+    <p>Ensures your music plays on any device or legacy player.</p>
+    <pre>#!/bin/bash
+INPUT_DIR="/storage/emulated/0/Music"
+OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
+TARGET_LUFS=-14
+MAX_TRUE_PEAK_DB=-1.5
+OUTPUT_SAMPLE_RATE=48000
+OUTPUT_CHANNELS=2
+QUALITY_MODE="192k" # Edit to 320k for higher quality
+
+mkdir -p "$OUTPUT_DIR"
+LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^(${MAX_TRUE_PEAK_DB}/20) }")
+
+if [[ "$QUALITY_MODE" =~ ^[0-9]+k$ ]]; then
+    MP3_OPTS="-b:a $QUALITY_MODE"
+else
+    VBR_QUALITY=${QUALITY_MODE#V}
+    MP3_OPTS="-q:a $VBR_QUALITY"
+fi
+
+for input_file in "$INPUT_DIR"/*.mp3; do
+    [ -e "$input_file" ] || continue
+    base_name=$(basename "$input_file" .mp3)
+    output_file="$OUTPUT_DIR/${base_name}.mp3"
+
+    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_TRUE_PEAK_DB:print_format=json" -f null - 2>&1)
+    input_i=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"-?\d+\.?\d*"' | cut -d ':' -f2 | tr -d ' "')
+
+    if [ -z "$input_i" ]; then continue; fi
+    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
+
+    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libmp3lame $MP3_OPTS "$output_file"
+done
+echo "Done: All files processed."</pre>
+
+    <div class="footer">
+        &copy; 2026 CloudDream Audio Player. All rights reserved.<br>
+        Scripts provided for educational use.
+    </div>
+
+</body>
+  </html>
