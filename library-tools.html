@@ -16,11 +16,27 @@
         h3 { color: #34495e; margin-top: 20px; border-left: 4px solid #3A7FFF; padding-left: 10px; }
         p { margin-bottom: 15px; }
         .step { background: #f1f3f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3A7FFF; }
+        
+        /* Container for copy button positioning */
+        .code-container { position: relative; margin-bottom: 25px; }
+        
         pre { 
             background: #2d2d2d; color: #f8f8f2; padding: 15px; 
             border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.4;
-            position: relative; margin-bottom: 25px;
+            margin: 0;
         }
+
+        /* Copy Button Styling */
+        .copy-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff; padding: 5px 10px; border-radius: 4px; cursor: pointer;
+            font-size: 11px; text-transform: uppercase; font-weight: bold;
+            transition: all 0.2s; backdrop-filter: blur(4px);
+        }
+        .copy-btn:hover { background: #3A7FFF; border-color: #3A7FFF; }
+        .copy-btn.copied { background: #4CAF50; border-color: #4CAF50; }
+
         .command-list {
             background: #2d2d2d; color: #f8f8f2; padding: 15px;
             border-radius: 8px; font-family: monospace; font-size: 14px;
@@ -33,11 +49,10 @@
         .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
         .footer { margin-top: 50px; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
         
-        /* IMPROVED DARK MODE READABILITY */
         @media (prefers-color-scheme: dark) {
             body { background-color: #121212; color: #E0E0E0; }
             h1 { color: #FFFFFF; border-bottom-color: #333; }
-            h2 { color: #BB86FC; } /* High visibility violet */
+            h2 { color: #BB86FC; }
             h3 { color: #8AB4F8; border-left-color: #BB86FC; }
             strong { color: #FFFFFF; }
             .step { background: #1E1E1E; color: #FFFFFF; border-left-color: #BB86FC; }
@@ -91,7 +106,9 @@
 
     <h3>Option A: Opus (High Efficiency)</h3>
     <p>Recommended for mobile. Best balance of small file size and high audio quality.</p>
-    <pre>#!/bin/bash
+    <div class="code-container">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre id="codeOpus">#!/bin/bash
 INPUT_DIR="/storage/emulated/0/Music"
 OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
 TARGET_LUFS=-14
@@ -118,10 +135,13 @@ for input_file in "$INPUT_DIR"/*.mp3; do
     ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libopus -b:a "$OPUS_BITRATE" -vbr on -compression_level 10 "$output_file"
 done
 echo "Done: All files processed."</pre>
+    </div>
 
     <h3>Option B: FLAC (Lossless)</h3>
     <p>Best for audiophiles who want no loss in audio data while keeping volumes consistent.</p>
-    <pre>#!/bin/bash
+    <div class="code-container">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre id="codeFlac">#!/bin/bash
 INPUT_DIR="/storage/emulated/0/Music"
 OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
 TARGET_LUFS=-14
@@ -147,10 +167,13 @@ for input_file in "$INPUT_DIR"/*.mp3; do
     ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a "$OUTPUT_CODEC" "$output_file"
 done
 echo "Done: All files processed."</pre>
+    </div>
 
     <h3>Option C: MP3 (Maximum Compatibility)</h3>
     <p>Ensures your music plays on any device or legacy player.</p>
-    <pre>#!/bin/bash
+    <div class="code-container">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre id="codeMp3">#!/bin/bash
 INPUT_DIR="/storage/emulated/0/Music"
 OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
 TARGET_LUFS=-14
@@ -183,11 +206,33 @@ for input_file in "$INPUT_DIR"/*.mp3; do
     ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libmp3lame $MP3_OPTS "$output_file"
 done
 echo "Done: All files processed."</pre>
+    </div>
 
     <div class="footer">
         &copy; 2026 CloudDream Audio Player. All rights reserved.<br>
         Scripts provided for educational use.
     </div>
 
+    <script>
+        function copyCode(button) {
+            const pre = button.nextElementSibling;
+            const text = pre.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerText;
+                button.innerText = "Copied!";
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+
 </body>
-</html>
+    </html>
+    
