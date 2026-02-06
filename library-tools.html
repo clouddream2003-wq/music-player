@@ -44,8 +44,10 @@
         .command-list li:last-child { border-bottom: none; }
         .command-text { color: #3A7FFF; font-weight: bold; display: block; margin-bottom: 4px; }
         .command-desc { font-size: 0.9em; color: #bbb; display: block; line-height: 1.2; }
+        
         .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
-        .permission-box { background: #e7f0ff; padding: 15px; border-radius: 8px; border: 1px solid #b3d1ff; margin-top: 10px; font-size: 0.95em; }
+        .permission-tip { border: 1px dashed #3A7FFF; padding: 10px; margin-top: 10px; border-radius: 6px; font-size: 0.9em; background: #f0f7ff; }
+
         .footer { margin-top: 50px; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
         
         @media (prefers-color-scheme: dark) {
@@ -58,7 +60,7 @@
             .command-text { color: #8AB4F8; }
             .command-desc { color: #BDBDBD; }
             .warning { background: #2C2510; color: #FFE082; border-color: #664D03; }
-            .permission-box { background: #1a232e; color: #8AB4F8; border-color: #2c3e50; }
+            .permission-tip { background: #111827; color: #93C5FD; border-color: #3B82F6; }
             .footer { border-top-color: #333; color: #999; }
             a { color: #8AB4F8; }
         }
@@ -100,8 +102,8 @@
             </li>
         </ul>
 
-        <div class="permission-box">
-            <strong>Android 11+ Users:</strong> To ensure Termux can write files to your Music folder, go to <strong>Settings > Apps > Termux > Permissions > Files and Media</strong> and select <strong>"Allow management of all files"</strong>.
+        <div class="permission-tip">
+            <strong>Android 11+ Users:</strong> If the script fails to find files, go to your phone <strong>Settings > Apps > Termux > Permissions > Files and Media</strong> and select <strong>"Allow management of all files"</strong>.
         </div>
     </div>
 
