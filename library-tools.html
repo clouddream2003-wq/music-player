@@ -36,8 +36,12 @@
         @media (prefers-color-scheme: dark) {
             body { background-color: #121212; color: #e0e0e0; }
             h1 { color: #ffffff; border-bottom-color: #333; }
-            h3 { color: #8ab4f8; }
-            .step { background: #1e1e1e; color: #e0e0e0; }
+            h2 { color: #5ea1ff; } /* Brighter blue for headers */
+            h3 { color: #8ab4f8; border-left-color: #5ea1ff; }
+            a { color: #8ab4f8; } /* Ensures links are readable */
+            .step { background: #1e1e1e; color: #e0e0e0; border-left-color: #5ea1ff; }
+            .command-text { color: #8ab4f8; } /* Light blue for commands */
+            .command-desc { color: #d1d1d1; } /* Lightened from #bbb for better contrast on dark bg */
             .warning { background: #2c2205; color: #ffe69c; border-color: #664d03; }
             .footer { border-top-color: #333; color: #999; }
         }
@@ -184,4 +188,5 @@ echo "Done: All files processed."</pre>
     </div>
 
 </body>
-  </html>
+                                                                 </html>
+    
