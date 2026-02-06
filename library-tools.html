@@ -68,21 +68,6 @@
 
     <h1>Library Tools: Audio Normalization</h1>
     <p>Achieve a consistent volume across your entire offline library using <strong>Industry Standard LUFS Normalization</strong> (-14 LUFS). Since mobile processing is heavy on battery, we recommend using <strong>Termux</strong> for this task.</p>
-    
-    <div class="warning">
-<strong>Android Storage Permissions (Important):</strong><br>
-On Android 11 and higher, apps are restricted by <em>Scoped Storage</em>.
-Termux does <strong>not</strong> receive full device access.
-<br><br>
-Running <code>termux-setup-storage</code> is required to grant access to
-shared folders such as:
-<ul>
-<li><code>/storage/emulated/0/Music</code></li>
-<li><code>/storage/emulated/0/Download</code></li>
-</ul>
-These scripts are designed to work within Android’s permission model
-and do <strong>not</strong> require root or “All files access”.
-</div>
 
     <div class="warning">
         <strong>Important:</strong> These scripts create optimized copies of your music in a new folder (<code>EncodedMusic</code>). Your original files will remain untouched.
@@ -249,4 +234,4 @@ echo "Done: All files processed."</pre>
     </script>
 
 </body>
-        </html>
+    </html>
