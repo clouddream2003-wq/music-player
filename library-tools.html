@@ -17,7 +17,6 @@
         p { margin-bottom: 15px; }
         .step { background: #f1f3f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3A7FFF; }
         
-        /* Container for copy button positioning */
         .code-container { position: relative; margin-bottom: 25px; }
         
         pre { 
@@ -26,7 +25,6 @@
             margin: 0;
         }
 
-        /* Copy Button Styling */
         .copy-btn {
             position: absolute; top: 10px; right: 10px;
             background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
@@ -47,6 +45,7 @@
         .command-text { color: #3A7FFF; font-weight: bold; display: block; margin-bottom: 4px; }
         .command-desc { font-size: 0.9em; color: #bbb; display: block; line-height: 1.2; }
         .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
+        .permission-box { background: #e7f0ff; padding: 15px; border-radius: 8px; border: 1px solid #b3d1ff; margin-top: 10px; font-size: 0.95em; }
         .footer { margin-top: 50px; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
         
         @media (prefers-color-scheme: dark) {
@@ -59,6 +58,7 @@
             .command-text { color: #8AB4F8; }
             .command-desc { color: #BDBDBD; }
             .warning { background: #2C2510; color: #FFE082; border-color: #664D03; }
+            .permission-box { background: #1a232e; color: #8AB4F8; border-color: #2c3e50; }
             .footer { border-top-color: #333; color: #999; }
             a { color: #8AB4F8; }
         }
@@ -99,6 +99,10 @@
                 <span class="command-desc">Installs the core engine used to analyze, normalize, and encode your audio files.</span>
             </li>
         </ul>
+
+        <div class="permission-box">
+            <strong>Android 11+ Users:</strong> To ensure Termux can write files to your Music folder, go to <strong>Settings > Apps > Termux > Permissions > Files and Media</strong> and select <strong>"Allow management of all files"</strong>.
+        </div>
     </div>
 
     <h2>Phase 2: Choose Your Script</h2>
@@ -234,5 +238,4 @@ echo "Done: All files processed."</pre>
     </script>
 
 </body>
-    </html>
-    
+</html>
