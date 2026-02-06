@@ -9,13 +9,13 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             line-height: 1.6; color: #333; background-color: #ffffff;
             max-width: 850px; margin: 0 auto; padding: 20px; 
-            transition: background-color 0.3s, color: 0.3s;
+            transition: background-color 0.3s, color 0.3s;
         }
         h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         h2 { color: #3A7FFF; margin-top: 30px; }
         h3 { color: #34495e; margin-top: 20px; border-left: 4px solid #3A7FFF; padding-left: 10px; }
         p { margin-bottom: 15px; }
-        .step { background: #f1f3f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3A7FFF; color: #333; }
+        .step { background: #f1f3f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #3A7FFF; }
         
         .code-container { position: relative; margin-bottom: 25px; }
         
@@ -36,36 +36,32 @@
         .copy-btn.copied { background: #4CAF50; border-color: #4CAF50; }
 
         .command-list {
-            background: #2d2d2d; color: #f8f8f2; padding: 15px;
+            background: #1a1a1a; color: #f8f8f2; padding: 15px;
             border-radius: 8px; font-family: monospace; font-size: 14px;
             list-style: none; margin: 10px 0;
         }
-        .command-list li { margin-bottom: 12px; border-bottom: 1px solid #444; padding-bottom: 8px; }
+        .command-list li { margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 8px; }
         .command-list li:last-child { border-bottom: none; }
         .command-text { color: #3A7FFF; font-weight: bold; display: block; margin-bottom: 4px; }
         .command-desc { font-size: 0.9em; color: #bbb; display: block; line-height: 1.2; }
         
         .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
-        .permission-tip { border: 1px dashed #3A7FFF; padding: 10px; margin-top: 10px; border-radius: 6px; font-size: 0.9em; background: #f0f7ff; color: #004085; }
+        .permission-tip { border: 1px dashed #3A7FFF; padding: 15px; margin-top: 15px; border-radius: 8px; font-size: 0.95em; background: #f0f7ff; color: #004085; }
 
         .footer { margin-top: 50px; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
         
+        /* FIX FOR DARK MODE READABILITY */
         @media (prefers-color-scheme: dark) {
             body { background-color: #121212; color: #E0E0E0; }
             h1 { color: #FFFFFF; border-bottom-color: #333; }
             h2 { color: #BB86FC; }
             h3 { color: #8AB4F8; border-left-color: #BB86FC; }
             strong { color: #FFFFFF; }
-            
-            /* FIXED: High contrast text for dark mode steps */
-            .step { background: #1E1E1E; color: #FFFFFF; border-left-color: #BB86FC; }
+            .step { background: #1e1e1e; color: #E0E0E0; border-left-color: #BB86FC; }
             .command-text { color: #8AB4F8; }
             .command-desc { color: #BDBDBD; }
             .warning { background: #2C2510; color: #FFE082; border-color: #664D03; }
-            
-            /* FIXED: Improved readability for Permission Tip */
             .permission-tip { background: #1a2233; color: #93C5FD; border-color: #3B82F6; }
-            
             .footer { border-top-color: #333; color: #999; }
             a { color: #8AB4F8; }
         }
