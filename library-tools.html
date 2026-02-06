@@ -33,17 +33,19 @@
         .warning { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
         .footer { margin-top: 50px; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 20px; text-align: center; }
         
+        /* IMPROVED DARK MODE READABILITY */
         @media (prefers-color-scheme: dark) {
-            body { background-color: #121212; color: #e0e0e0; }
-            h1 { color: #ffffff; border-bottom-color: #333; }
-            h2 { color: #5ea1ff; } /* Brighter blue for headers */
-            h3 { color: #8ab4f8; border-left-color: #5ea1ff; }
-            a { color: #8ab4f8; } /* Ensures links are readable */
-            .step { background: #1e1e1e; color: #e0e0e0; border-left-color: #5ea1ff; }
-            .command-text { color: #8ab4f8; } /* Light blue for commands */
-            .command-desc { color: #d1d1d1; } /* Lightened from #bbb for better contrast on dark bg */
-            .warning { background: #2c2205; color: #ffe69c; border-color: #664d03; }
+            body { background-color: #121212; color: #E0E0E0; }
+            h1 { color: #FFFFFF; border-bottom-color: #333; }
+            h2 { color: #BB86FC; } /* High visibility violet */
+            h3 { color: #8AB4F8; border-left-color: #BB86FC; }
+            strong { color: #FFFFFF; }
+            .step { background: #1E1E1E; color: #FFFFFF; border-left-color: #BB86FC; }
+            .command-text { color: #8AB4F8; }
+            .command-desc { color: #BDBDBD; }
+            .warning { background: #2C2510; color: #FFE082; border-color: #664D03; }
             .footer { border-top-color: #333; color: #999; }
+            a { color: #8AB4F8; }
         }
     </style>
 </head>
@@ -188,5 +190,4 @@ echo "Done: All files processed."</pre>
     </div>
 
 </body>
-                                                                 </html>
-    
+</html>
