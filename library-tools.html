@@ -132,7 +132,7 @@ for input_file in "$INPUT_DIR"/*.mp3; do
     if [ -z "$input_i" ]; then continue; fi
     gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
 
-    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libopus -b:a "$OPUS_BITRATE" -vbr on -compression_level 10 "$output_file"
+    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libopus -b:a "$OPUS_BITRATE" -vbr on -compression_level 10 "$output_file"
 done
 echo "Done: All files processed."</pre>
     </div>
@@ -164,7 +164,7 @@ for input_file in "$INPUT_DIR"/*.mp3; do
     if [ -z "$input_i" ]; then continue; fi
     gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
 
-    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a "$OUTPUT_CODEC" "$output_file"
+    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a "$OUTPUT_CODEC" "$output_file"
 done
 echo "Done: All files processed."</pre>
     </div>
@@ -203,7 +203,7 @@ for input_file in "$INPUT_DIR"/*.mp3; do
     if [ -z "$input_i" ]; then continue; fi
     gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
 
-    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=50:level=disabled" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libmp3lame $MP3_OPTS "$output_file"
+    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a libmp3lame $MP3_OPTS "$output_file"
 done
 echo "Done: All files processed."</pre>
     </div>
@@ -235,4 +235,5 @@ echo "Done: All files processed."</pre>
 
 </body>
     </html>
+
 
