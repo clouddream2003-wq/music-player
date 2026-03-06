@@ -177,32 +177,69 @@ echo "Done: All files encoded to Opus."
     <p>Best for audiophiles who want no loss in audio data while keeping volumes consistent.</p>
     <div class="code-container">
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-        <pre id="codeFlac">#!/bin/bash
-INPUT_DIR="/storage/emulated/0/Music"
+        <pre id="codeFlac">
+#!/bin/bash
+
+INPUT_DIR="/storage/emulated/0/Music/Telegram"
 OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
 TARGET_LUFS=-14
-MAX_TRUE_PEAK_DB=-1.5
+MAX_TRUE_PEAK_DB=-1.0
+
 OUTPUT_SAMPLE_RATE=48000
 OUTPUT_CHANNELS=2
 OUTPUT_CODEC="flac"
 
 mkdir -p "$OUTPUT_DIR"
+
+# Convert dBTP → linear (required by alimiter)
 LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^(${MAX_TRUE_PEAK_DB}/20) }")
 
 for input_file in "$INPUT_DIR"/*.mp3; do
     [ -e "$input_file" ] || continue
+
     base_name=$(basename "$input_file" .mp3)
     output_file="$OUTPUT_DIR/${base_name}.flac"
 
-    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_TRUE_PEAK_DB:print_format=json" -f null - 2>&1)
-    input_i=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"-?\d+\.?\d*"' | cut -d ':' -f2 | tr -d ' "')
+    echo "------------------------------------------------"
+    echo "Analyzing: $base_name..."
 
-    if [ -z "$input_i" ]; then continue; fi
+    stats=$(ffmpeg -hide_banner -i "$input_file" \
+        -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_TRUE_PEAK_DB:print_format=json" \
+        -f null - 2>&1)
+
+    input_i=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
+    input_tp=$(echo "$stats" | grep -oP '"input_tp"\s*:\s*"\K[^"]+')
+
+    if [ -z "$input_i" ]; then
+        echo "Could not read audio stats. Skipping."
+        continue
+    fi
+
     gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
+     
+    is_safe=$(awk "BEGIN { if ($input_tp + $gain > $MAX_TRUE_PEAK_DB) print \"unsafe\"; else print \"safe\" }")
 
-    ffmpeg -hide_banner -y -i "$input_file" -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}" -ar "$OUTPUT_SAMPLE_RATE" -ac "$OUTPUT_CHANNELS" -c:a "$OUTPUT_CODEC" "$output_file"
+    if [ "$is_safe" == "unsafe" ]; then
+        echo "⚠️  WARNING: Target volume too high for this file's peaks."
+        echo "    The 'alimiter' will prevent clipping (sound may be slightly compressed)."
+    else
+        echo "✅ Peak Check Passed: Applying clean linear gain of ${gain}dB."
+    fi
+
+    echo "Stats -> Measured: $input_i LUFS | Target: $TARGET_LUFS | TP: $input_tp"
+
+    ffmpeg -hide_banner -y -i "$input_file" \
+        -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=100" \
+        -ar "$OUTPUT_SAMPLE_RATE" \
+        -ac "$OUTPUT_CHANNELS" \
+        -c:a "$OUTPUT_CODEC" \
+        "$output_file"
+
 done
-echo "Done: All files processed."</pre>
+
+echo "------------------------------------------------"
+echo "Done: All files encoded to Flac."    
+        </pre>
     </div>
 
     <h3>Option C: MP3 (Maximum Compatibility)</h3>
@@ -301,6 +338,7 @@ echo "Done: All files encoded to MP3."
 
 </body>
     </html>
+
 
 
 
