@@ -311,6 +311,77 @@ echo "Done: All files encoded to MP3."
         </pre>
     </div>
 
+    <h3>Option D: M4A (Maximum Quality & Compatibility)</h3>
+    <p>The standard for Apple devices and modern Android players. Best for keeping high-quality audio and Album Art intact.</p>
+    <div class="code-container">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre id="codeM4a">
+#!/bin/bash
+
+INPUT_DIR="/storage/emulated/0/Music/Telegram"
+OUTPUT_DIR="$INPUT_DIR/EncodedMusic"
+TARGET_LUFS=-14.0
+MAX_PEAK_DB=-1.0
+
+mkdir -p "$OUTPUT_DIR"
+
+# Convert dB to linear for the limiter
+LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^($MAX_PEAK_DB/20) }")
+
+# Gather files for the counter
+files=("$INPUT_DIR"/*.mp3)
+total_files=${#files[@]}
+current=0
+
+if [ ! -e "${files[0]}" ]; then
+    echo "No MP3 files found in $INPUT_DIR"
+    exit 0
+fi
+
+for input_file in "${files[@]}"; do
+    [ -e "$input_file" ] || continue
+    ((current++))
+    
+    base_name=$(basename "$input_file" .mp3)
+    output_file="$OUTPUT_DIR/${base_name}.m4a"
+
+    echo "------------------------------------------------"
+    echo "[$current/$total_files] Analyzing: $base_name"
+    
+    # Get stats using grep/awk for speed
+    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_PEAK_DB:print_format=json" -f null - 2>&1)
+    i_meas=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
+
+    if [ -z "$i_meas" ] || [ "$i_meas" == "null" ]; then 
+        echo "Error: Skipping $base_name"
+        continue 
+    fi
+
+    # Calculate gain for Strong Vocals
+    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $i_meas }")
+    echo "Voice Boost: ${gain}dB | Peak Limit: ${MAX_PEAK_DB}dB"
+
+    # THE MASTER FILTER:
+    # level=false ensures NO dynamic pumping.
+    FILTER="volume=${gain}dB,alimiter=level=false:limit=$LIMIT_LINEAR:attack=5:release=50"
+
+    # Use -stats for real-time progress
+    # Restored -map 0:v:0? and -c:v copy for Album Art
+    ffmpeg -hide_banner -y -stats -i "$input_file" \
+        -af "$FILTER" \
+        -c:a aac -b:a 320k \
+        -ar 48000 -ac 2 \
+        -map 0:a:0 -map 0:v:0? \
+        -c:v copy -disposition:v:0 attached_pic \
+        -map_metadata 0 \
+        "$output_file"
+done
+
+echo "------------------------------------------------"
+echo "DONE! Total Processed: $total_files"        
+        </pre>
+    </div>
+
     <div class="footer">
         &copy; 2026 CloudDream Audio Player. All rights reserved.<br>
         Scripts provided for educational use.
@@ -338,6 +409,7 @@ echo "Done: All files encoded to MP3."
 
 </body>
     </html>
+
 
 
 
