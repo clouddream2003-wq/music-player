@@ -136,7 +136,7 @@ for input_file in "${files[@]}"; do
     ((current++))
     
     base_name=$(basename "$input_file" .mp3)
-    output_file="$OUTPUT_DIR/${base_name}.m4a"
+    output_file="$OUTPUT_DIR/${base_name}.opus"
 
     echo "------------------------------------------------"
     echo "[$current/$total_files] Analyzing: $base_name"
@@ -158,15 +158,13 @@ for input_file in "${files[@]}"; do
     # level=false ensures NO dynamic pumping.
     FILTER="volume=${gain}dB,alimiter=level=false:limit=$LIMIT_LINEAR:attack=5:release=50"
 
-    # Use -stats for real-time progress
-    # Restored -map 0:v:0? and -c:v copy for Album Art
+    # Use -stats for a real-time encoding progress bar
     ffmpeg -hide_banner -y -stats -i "$input_file" \
         -af "$FILTER" \
-        -c:a aac -b:a 320k \
-        -ar 48000 -ac 2 \
-        -map 0:a:0 -map 0:v:0? \
-        -c:v copy -disposition:v:0 attached_pic \
+        -c:a libopus -b:a 128k -vbr on \
+        -ar 48000 \
         -map_metadata 0 \
+        -map 0:a:0 \
         "$output_file"
 done
 
@@ -340,6 +338,7 @@ echo "Done: All files encoded to MP3."
 
 </body>
     </html>
+
 
 
 
