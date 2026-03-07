@@ -1,6 +1,10 @@
 {
-  "latest_version": "478 _2025",
+  "latest_version": "499",
   "updates": [
+    {
+      "v": "499",
+      "notes": "• • Fixed a bug where some songs would start muted for a few seconds.\n• • Fixed Repeat button UI sync issues."
+    },
     {
       "v": "478 _2025",
       "notes": "• Initial Release"
