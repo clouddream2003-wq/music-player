@@ -112,64 +112,66 @@
 #!/bin/bash
 
 INPUT_DIR="/storage/emulated/0/Music/Telegram"
-OUTPUT_DIR="/storage/emulated/0/Music/EncodedMusic"
-TARGET_LUFS=-14
-MAX_TRUE_PEAK_DB=-1.0
-
-OUTPUT_SAMPLE_RATE=48000
-OUTPUT_CHANNELS=2
-OUTPUT_CODEC="libopus"
-BITRATE="128k"
+OUTPUT_DIR="$INPUT_DIR/EncodedMusic"
+TARGET_LUFS=-14.0
+MAX_PEAK_DB=-1.0
 
 mkdir -p "$OUTPUT_DIR"
 
-# Convert dBTP → linear (required by alimiter)
-LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^(${MAX_TRUE_PEAK_DB}/20) }")
+# Convert dB to linear for the limiter
+LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^($MAX_PEAK_DB/20) }")
 
-for input_file in "$INPUT_DIR"/*.mp3; do
+# Gather files for the counter
+files=("$INPUT_DIR"/*.mp3)
+total_files=${#files[@]}
+current=0
+
+if [ ! -e "${files[0]}" ]; then
+    echo "No MP3 files found in $INPUT_DIR"
+    exit 0
+fi
+
+for input_file in "${files[@]}"; do
     [ -e "$input_file" ] || continue
-
+    ((current++))
+    
     base_name=$(basename "$input_file" .mp3)
-    output_file="$OUTPUT_DIR/${base_name}.opus"
+    output_file="$OUTPUT_DIR/${base_name}.m4a"
 
     echo "------------------------------------------------"
-    echo "Analyzing: $base_name..."
-
-    stats=$(ffmpeg -hide_banner -i "$input_file" \
-        -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_TRUE_PEAK_DB:print_format=json" \
-        -f null - 2>&1)
-
-    input_i=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
-    input_tp=$(echo "$stats" | grep -oP '"input_tp"\s*:\s*"\K[^"]+')
-
-    if [ -z "$input_i" ]; then
-        echo "Could not read audio stats. Skipping."
-        continue
-    fi
-
-    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $input_i }")
+    echo "[$current/$total_files] Analyzing: $base_name"
     
-    is_safe=$(awk "BEGIN { if ($input_tp + $gain > $MAX_TRUE_PEAK_DB) print \"unsafe\"; else print \"safe\" }")
+    # Get stats using grep/awk for speed
+    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_PEAK_DB:print_format=json" -f null - 2>&1)
+    i_meas=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
 
-    if [ "$is_safe" == "unsafe" ]; then
-        echo "⚠️  WARNING: Applying alimiter to prevent clipping."
-    else
-        echo "✅ Peak Check Passed: Applying linear gain of ${gain}dB."
+    if [ -z "$i_meas" ] || [ "$i_meas" == "null" ]; then 
+        echo "Error: Skipping $base_name"
+        continue 
     fi
 
-    ffmpeg -hide_banner -y -i "$input_file" \
-        -af "volume=${gain}dB,alimiter=limit=${LIMIT_LINEAR}:attack=5:release=100" \
-        -ar "$OUTPUT_SAMPLE_RATE" \
-        -ac "$OUTPUT_CHANNELS" \
-        -c:a "$OUTPUT_CODEC" \
-        -b:a "$BITRATE" \
-        -vbr on \
-        "$output_file"
+    # Calculate gain for Strong Vocals
+    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $i_meas }")
+    echo "Voice Boost: ${gain}dB | Peak Limit: ${MAX_PEAK_DB}dB"
 
+    # THE MASTER FILTER:
+    # level=false ensures NO dynamic pumping.
+    FILTER="volume=${gain}dB,alimiter=level=false:limit=$LIMIT_LINEAR:attack=5:release=50"
+
+    # Use -stats for real-time progress
+    # Restored -map 0:v:0? and -c:v copy for Album Art
+    ffmpeg -hide_banner -y -stats -i "$input_file" \
+        -af "$FILTER" \
+        -c:a aac -b:a 320k \
+        -ar 48000 -ac 2 \
+        -map 0:a:0 -map 0:v:0? \
+        -c:v copy -disposition:v:0 attached_pic \
+        -map_metadata 0 \
+        "$output_file"
 done
 
 echo "------------------------------------------------"
-echo "Done: All files encoded to Opus."    
+echo "DONE! Total Processed: $total_files"       
         </pre>
     </div>
 
@@ -338,6 +340,7 @@ echo "Done: All files encoded to MP3."
 
 </body>
     </html>
+
 
 
 
