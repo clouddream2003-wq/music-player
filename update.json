@@ -3,7 +3,7 @@
   "updates": [
     {
       "v": "499",
-      "notes": "• • Fixed a bug where some songs would start muted for a few seconds.\n• • Fixed Repeat button UI sync issues."
+      "notes": "• Fixed a bug where some songs would start muted for a few seconds.\n• Fixed Repeat button UI sync issues."
     },
     {
       "v": "478 _2025",
