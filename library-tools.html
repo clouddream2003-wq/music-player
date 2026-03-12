@@ -116,6 +116,51 @@
     <h2>Phase 2: Choose Your Script</h2>
     <p>Copy the script below based on your preferred output format & paste directly inside Android Termux.</p>
 
+        <style>
+        /* Table Styling */
+        .comparison-table {
+            width: 100%; border-collapse: collapse; margin: 20px 0;
+            background: #fff; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 0.9em;
+        }
+        .comparison-table th { background: #3A7FFF; color: white; padding: 12px; text-align: left; }
+        .comparison-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        
+        @media (prefers-color-scheme: dark) {
+            .comparison-table { background: #1E1E1E; }
+            .comparison-table td { border-bottom-color: #333; color: #BDBDBD; }
+            .comparison-table th { background: #BB86FC; color: #000; }
+        }
+    </style>
+
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Format</th>
+                <th>Loudness Quality</th>
+                <th>Why?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Opus</strong></td>
+                <td>⭐⭐⭐⭐⭐ (Best)</td>
+                <td>Most modern; handles -0.1dB peaks without adding "fuzz" or hiss.</td>
+            </tr>
+            <tr>
+                <td><strong>FLAC</strong></td>
+                <td>⭐⭐⭐⭐ (Perfect)</td>
+                <td>Best quality, but files are huge. Loudness is identical to Opus but takes 5x the space.</td>
+            </tr>
+            <tr>
+                <td><strong>M4A</strong></td>
+                <td>⭐⭐⭐ (Great)</td>
+                <td>Very loud and clean, but is an older technology compared to Opus.</td>
+            </tr>
+        </tbody>
+    </table>
+
     <h3>Option A: Opus (High Efficiency)</h3>
     <p>Recommended for mobile. Best balance of small file size and high audio quality.</p>
     <div class="code-container">
@@ -325,6 +370,7 @@ echo "DONE! Total Processed: $total_files"
 
 </body>
     </html>
+
 
 
 
