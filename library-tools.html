@@ -98,6 +98,19 @@
                 <span class="command-text">pkg install ffmpeg -y</span>
                 <span class="command-desc">Installs the core engine used to analyze, normalize, and encode your audio files.</span>
             </li>
+            <li>
+                <span class="command-text">pkg install gawk -y</span>
+                <span class="command-desc">Provides a high-performance math engine that calculates the precise decimal values needed for the audio limiter.</span>
+            </li>
+            <li>
+                <span class="command-text">pkg install grep -y</span>
+                <span class="command-desc">Installs the advanced text tool that allows the script to "read" the digital loudness stats from FFmpeg.</span>
+            </li>
+            <li>   
+                <span class="command-text">pkg install termux-api -y</span>
+                <span class="command-desc">Required to make the termux-wake-lock command work, preventing Android from sleeping during processing.</span>
+            </li>
+            <li>
         </ul>
     </div>
 
@@ -312,6 +325,7 @@ echo "DONE! Total Processed: $total_files"
 
 </body>
     </html>
+
 
 
 
