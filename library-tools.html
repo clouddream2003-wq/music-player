@@ -179,140 +179,62 @@ echo "DONE! Total Processed: $total_files"
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         <pre id="codeFlac">
 #!/bin/bash
+termux-wake-lock
 
 INPUT_DIR="/storage/emulated/0/Music/Telegram"
 OUTPUT_DIR="$INPUT_DIR/EncodedMusic"
-TARGET_LUFS=-14.0
-MAX_PEAK_DB=-1.0
+
+TARGET_LUFS=-10.0
+# Peak -0.1 is the absolute maximum digital ceiling
+MAX_PEAK_DB=-0.1
 
 mkdir -p "$OUTPUT_DIR"
 
-# Convert dB to linear for the limiter
 LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^($MAX_PEAK_DB/20) }")
 
-# Gather files for the counter
 files=("$INPUT_DIR"/*.mp3)
 total_files=${#files[@]}
 current=0
-
-if [ ! -e "${files[0]}" ]; then
-    echo "No MP3 files found in $INPUT_DIR"
-    exit 0
-fi
+SCRIPT_START=$(date +%s)
 
 for input_file in "${files[@]}"; do
     [ -e "$input_file" ] || continue
     ((current++))
-    
+
     base_name=$(basename "$input_file" .mp3)
+    # Extension changed to flac
     output_file="$OUTPUT_DIR/${base_name}.flac"
 
     echo "------------------------------------------------"
-    echo "[$current/$total_files] Analyzing: $base_name"
+    echo "[$current/$total_files] Processing: $base_name"
     
-    # Get stats using grep/awk for speed
-    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_PEAK_DB:print_format=json" -f null - 2>&1)
+    # Get stats
+    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=${TARGET_LUFS}:TP=${MAX_PEAK_DB}:print_format=json" -f null - 2>&1)
     i_meas=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
 
-    if [ -z "$i_meas" ] || [ "$i_meas" == "null" ]; then 
-        echo "Error: Skipping $base_name"
-        continue 
-    fi
+    [ -z "$i_meas" ] && continue
 
-    # Calculate gain for Strong Vocals
-    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $i_meas }")
-    echo "Voice Boost: ${gain}dB | Peak Limit: ${MAX_PEAK_DB}dB"
+    gain=$(awk "BEGIN { printf \"%.2f\", ${TARGET_LUFS} - ${i_meas} }")
+    echo "Loudness Boost: ${gain}dB | Peak Limit: ${MAX_PEAK_DB}dB"
 
-    # THE MASTER FILTER:
-    # level=false ensures NO dynamic pumping.
-    FILTER="volume=${gain}dB,alimiter=level=false:limit=$LIMIT_LINEAR:attack=5:release=50"
+    # High-Res Internal Workspace + True Peak Protection
+    FILTER="aresample=192000,volume=${gain}dB,alimiter=level=true:limit=${LIMIT_LINEAR}:attack=5:release=85,aresample=48000"
 
-    # Encoding Pass: FLAC Lossless
-    ffmpeg -hide_banner -y -stats -i "$input_file" \
+    ffmpeg -hide_banner -y -stats -threads 4 -i "$input_file" \
         -af "$FILTER" \
         -c:a flac \
         -ar 48000 \
-        -map 0:a:0 -map 0:v:0? \
-        -c:v copy -disposition:v:0 attached_pic \
         -map_metadata 0 \
+        -map 0:a:0 \
         "$output_file"
 done
 
-echo "------------------------------------------------"
-echo "DONE! Total Processed: $total_files"  
+termux-wake-unlock
+echo "DONE!"
         </pre>
     </div>
-
-    <h3>Option C: MP3 (Maximum Compatibility)</h3>
-    <p>Ensures your music plays on any device or legacy player.</p>
-    <div class="code-container">
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-        <pre id="codeMp3">
-#!/bin/bash
-
-INPUT_DIR="/storage/emulated/0/Music/Telegram"
-OUTPUT_DIR="$INPUT_DIR/EncodedMusic"
-TARGET_LUFS=-14.0
-MAX_PEAK_DB=-1.0
-
-mkdir -p "$OUTPUT_DIR"
-
-# Convert dB to linear for the limiter
-LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^($MAX_PEAK_DB/20) }")
-
-# Gather files for the counter
-files=("$INPUT_DIR"/*.flac)
-total_files=${#files[@]}
-current=0
-
-if [ ! -e "${files[0]}" ]; then
-    echo "No FLAC files found in $INPUT_DIR"
-    exit 0
-fi
-
-for input_file in "${files[@]}"; do
-    [ -e "$input_file" ] || continue
-    ((current++))
     
-    base_name=$(basename "$input_file" .flac)
-    output_file="$OUTPUT_DIR/${base_name}.mp3"
-
-    echo "------------------------------------------------"
-    echo "[$current/$total_files] Analyzing: $base_name"
-    
-    # Get stats using grep/awk for speed
-    stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=$TARGET_LUFS:TP=$MAX_PEAK_DB:print_format=json" -f null - 2>&1)
-    i_meas=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
-
-    if [ -z "$i_meas" ] || [ "$i_meas" == "null" ]; then 
-        echo "Error: Skipping $base_name"
-        continue 
-    fi
-
-    # Calculate gain for Strong Vocals
-    gain=$(awk "BEGIN { printf \"%.2f\", $TARGET_LUFS - $i_meas }")
-    echo "Voice Boost: ${gain}dB | Peak Limit: ${MAX_PEAK_DB}dB"
-
-    # THE MASTER FILTER:
-    # level=false ensures NO dynamic pumping.
-    FILTER="volume=${gain}dB,alimiter=level=false:limit=$LIMIT_LINEAR:attack=5:release=50"
-
-    ffmpeg -hide_banner -y -stats -i "$input_file" \
-        -af "$FILTER" \
-        -c:a libmp3lame -b:a 320k \
-        -ar 48000 -ac 2 \
-        -map 0:a:0 -map 0:v:0? \
-        -c:v copy -disposition:v:0 attached_pic \
-        -map_metadata 0 \
-        "$output_file"
-done
-
-echo "------------------------------------------------"
-echo "DONE! Total Processed: $total_files"
-        </pre>
-    </div>
-
-    <h3>Option D: M4A (Maximum Quality & Compatibility)</h3>
+    <h3>Option C: M4A (Maximum Quality & Compatibility)</h3>
     <p>The standard for Apple devices and modern Android players. Best for keeping high-quality audio and Album Art intact.</p>
     <div class="code-container">
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -322,6 +244,7 @@ termux-wake-lock
 
 INPUT_DIR="/storage/emulated/0/Music/Telegram"
 OUTPUT_DIR="$INPUT_DIR/EncodedMusic"
+            
 TARGET_LUFS=-10.0
 # Peak -0.1 is the absolute maximum digital ceiling
 MAX_PEAK_DB=-0.1
@@ -399,6 +322,7 @@ echo "DONE!"
 
 </body>
     </html>
+
 
 
 
