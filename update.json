@@ -1,6 +1,10 @@
 {
-  "latest_version": "501",
+  "latest_version": "503",
   "updates": [
+    {
+      "v": "503",
+      "notes": "• Dynamic album art color integration for an immersive listening experience."
+    },
     {
       "v": "501",
       "notes": "• Resolved an issue where tapping search results could cause the app to exit.\n• Fixed a bug where the media controller would occasionally remain in the notification tray after closing the app.\n• Fixed Repeat button UI sync issues.\n• Improved \"Auto-Tag\" accuracy! The app now deep-scans internal file metadata for all formats (MP3, FLAC, M4A, etc.) to fill missing info automatically.\n• Improved Album Art management."
