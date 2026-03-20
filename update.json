@@ -1,6 +1,10 @@
 {
-  "latest_version": "503",
+  "latest_version": "505",
   "updates": [
+    {
+      "v": "505",
+      "notes": "• • album art & color transitions with a frame-by-frame blend"
+    },
     {
       "v": "503",
       "notes": "• Dynamic album art color integration for an immersive listening experience."
