@@ -59,18 +59,18 @@
     <ul>
         <li><strong>Storage (Read/Write):</strong> Required to display your songs and allow you to rename or delete files.</li>
         <li><strong>System Settings (Write):</strong> Required only if you use the "Set as Ringtone" feature.</li>
-        <li><strong>Internet Access:</strong> Required <em>strictly</em> for the "Support" features described below.</li>
+        <li><strong>Internet Access:</strong> Required <em>strictly</em> for the "Support" and "Documentation" features described below.</li>
     </ul>
 
     <div class="highlight">
         <h3>3. Third-Party Services & Internet Usage</h3>
-        <p>While CloudDream is an offline player, we use the internet for two specific functions in the "Support" menu:</p>
+        <p>While CloudDream is an offline player, internet access is used for two specific functions:</p>
         
-        <p><strong>A. Currency Conversion</strong><br>
-        To display donation tiers in your local currency, we query an open-source exchange rate API (<code>open.er-api.com</code>). This request sends your IP address to the API provider solely to fulfill the request. No personal data is attached.</p>
+        <p><strong>A. Support & Donations (Stripe)</strong><br>
+        If you choose to support the development of this app, we use <strong>Stripe</strong> as our payment processor. Clicking a support tier will redirect you to a secure Stripe Checkout page via a verified external browser. We <strong>never</strong> see or store your credit card or billing details; all transactions are handled by Stripe's secure infrastructure.</p>
 
-        <p><strong>B. Payments (Donations)</strong><br>
-        If you choose to support us, we use <strong>Stripe</strong> to process payments. When you click "Support" you are redirected to a secure Stripe Checkout page. We <strong>never</strong> see or store your credit card details. All financial transactions are handled directly by Stripe's secure servers.</p>
+        <p><strong>B. Technical Guides (GitHub Pages)</strong><br>
+        Our "Library Tools" section provides helpful technical documentation hosted on GitHub Pages. Accessing these guides requires a standard internet connection to display text and instructions. No personal information is tracked during this process.</p>
     </div>
 
     <h2>4. Changes to Files</h2>
@@ -87,7 +87,7 @@
     </div>
 
     <script>
-        document.getElementById('date').innerText = "January 10, 2026";
+        document.getElementById('date').innerText = "March 21, 2026";
     </script>
 </body>
 </html>
