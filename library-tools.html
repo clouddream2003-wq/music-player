@@ -242,9 +242,8 @@ termux-wake-lock
 INPUT_DIR="/storage/emulated/0/Music/Telegram"
 OUTPUT_DIR="$INPUT_DIR/EncodedMusic"
 
-TARGET_LUFS=-10.0
-# Peak -0.1 is the absolute maximum digital ceiling
-MAX_PEAK_DB=-0.1
+TARGET_LUFS=-14.0
+MAX_PEAK_DB=-1.5
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -253,30 +252,39 @@ LIMIT_LINEAR=$(awk "BEGIN { printf \"%.6f\", 10^($MAX_PEAK_DB/20) }")
 files=("$INPUT_DIR"/*.mp3)
 total_files=${#files[@]}
 current=0
-SCRIPT_START=$(date +%s)
 
 for input_file in "${files[@]}"; do
     [ -e "$input_file" ] || continue
     ((current++))
 
     base_name=$(basename "$input_file" .mp3)
-    # Extension changed to flac
     output_file="$OUTPUT_DIR/${base_name}.flac"
 
-    echo "------------------------------------------------"
+    echo
     echo "[$current/$total_files] Processing: $base_name"
     
-    # Get stats
     stats=$(ffmpeg -hide_banner -i "$input_file" -af "loudnorm=I=${TARGET_LUFS}:TP=${MAX_PEAK_DB}:print_format=json" -f null - 2>&1)
     i_meas=$(echo "$stats" | grep -oP '"input_i"\s*:\s*"\K[^"]+')
+    tp_meas=$(echo "$stats" | grep -oP '"input_tp"\s*:\s*"\K[^"]+')
 
-    [ -z "$i_meas" ] && continue
+    if [ -z "$i_meas" ] || [ -z "$tp_meas" ]; then
+        echo "  >> ERROR: Analysis failed. Skipping..."
+        continue
+    fi
 
-    gain=$(awk "BEGIN { printf \"%.2f\", ${TARGET_LUFS} - ${i_meas} }")
-    echo "Loudness Boost: ${gain}dB | Peak Limit: ${MAX_PEAK_DB}dB"
+    max_gain=$(awk "BEGIN { print $MAX_PEAK_DB - $tp_meas }")
+    needed_gain=$(awk "BEGIN { print $TARGET_LUFS - $i_meas }")
+    
+    if (( $(awk "BEGIN { print ($max_gain < $needed_gain) }") )); then
+        gain=$max_gain
+        STATUS="[PEAK LIMITED] Applying ${gain}dB (Max possible without heavy limiting)"
+    else
+        gain=$needed_gain
+        STATUS="[TARGET HIT] Applying ${gain}dB (Clean boost to -14 LUFS)"
+    fi
 
-    # High-Res Internal Workspace + True Peak Protection
-    FILTER="aresample=192000,volume=${gain}dB,alimiter=level=true:limit=${LIMIT_LINEAR}:attack=5:release=85,aresample=48000"
+    echo "  >> Status: $STATUS"
+    FILTER="aresample=192000,volume=${gain}dB,alimiter=level=false:limit=${LIMIT_LINEAR}:attack=5:release=85,aresample=48000"
 
     ffmpeg -hide_banner -y -stats -threads 4 -i "$input_file" \
         -af "$FILTER" \
@@ -288,7 +296,8 @@ for input_file in "${files[@]}"; do
 done
 
 termux-wake-unlock
-echo "DONE! Total Processed: $total_files"
+echo
+echo "DONE! Total Processed: $total_files"        
         </pre>
     </div>
     
